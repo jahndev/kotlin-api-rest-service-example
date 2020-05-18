@@ -1,0 +1,5 @@
+services:
+  authentication.url: http://
+  attempt.url: http://
+  payment.url: http://
+  hydra.url: https://

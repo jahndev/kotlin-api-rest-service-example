@@ -1,0 +1,30 @@
+server:
+  port: 8093
+
+apiGatewayBaseUrl: http://localhost
+frontendBaseUrl: http://localhost:3000
+
+services:
+  authentication.url: http://localhost:8079/
+  attempt.url: http://localhost:8080
+  payment.url: http://localhost:8080
+  hydra.url: https://
+  payu:
+    url: https://sandbox.api.payulatam.com/payments-api
+    version: 4.0
+
+logging:
+  level:
+    org.springframework.web.client.RestTemplate: ERROR
+
+pse:
+  transactionMinValue: 1600
+
+spring:
+  cache:
+    name: bankList
+    autoexpiry: true
+    expire.delay: 600000
+  rest-template:
+    paymentsos.connection-timeout: 5000
+    payu.connection-timeout: 10000

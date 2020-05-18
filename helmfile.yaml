@@ -1,0 +1,42 @@
+repositories:
+  - name: example
+    url: https://artifactory.example.repo/artifactory/helm
+    username: {{ requiredEnv "ARTIFACTORY_USER" }}
+    password: {{ requiredEnv "ARTIFACTORY_PASSWORD" }}
+
+helmDefaults:
+  tillerNamespace: payments-tiller
+  tillerless: true
+  kubeContext: default
+  verify: false
+  wait: true
+  atomic: true
+  timeout: 600
+  recreatePods: false
+  force: true
+  tls: false
+
+environments:
+    staging:
+    ireland:
+    virginia:
+    singapore:
+
+templates:
+  base: &base
+    missingFileHandler: Debug
+    values:
+      - charts/{{`{{ .Release.Name }}`}}/values.{{`{{ .Environment.Name }}`}}.yaml
+    secrets:
+      - charts/{{`{{ .Release.Name }}`}}/secrets.{{`{{ .Environment.Name }}`}}.yaml
+    set:
+      - name: "monetization-base.image.tag"
+        value: {{ env "CI_COMMIT_SHORT_SHA" | default "staging" }}
+      - name: monetization-base.metadata.annotations.deployment\.example\.io/deployment-time
+        value: T{{ date "20060102150405" now }}
+
+releases:
+  - name: kotlin-api-rest-service-example
+    chart: ./charts/kotlin-api-rest-service-example/
+    namespace: payments-apps
+    <<: *base

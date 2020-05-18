@@ -1,0 +1,105 @@
+# TODO - Replace YAML anchors with extends from GitLab 11.3
+
+.exclude: &exclude
+  except:
+    refs:
+      - tags
+      - schedules
+    variables:
+      - $CONFIG
+
+.tagging: &tagging
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA:0:8}
+    - docker tag $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA:0:8} $CI_REGISTRY_IMAGE:$CI_JOB_STAGE
+    - docker push $CI_REGISTRY_IMAGE:$CI_JOB_STAGE
+
+.deployment_template: &deployment_template
+  image: $CI_REGISTRY/shared-services/payment-solutions/build-env-docker:0.0.13
+  dependencies: []
+  script:
+    - make deploy OC_ARGS="--token=${OC_TOKEN} --server=${OC_URL} -n ${OC_PROJECT}" APP=${OC_APP}
+    - curl -X POST -H "X-Api-Key:${NR_API_KEY}" -v --data "deployment[revision]=${CI_BUILD_REF}&deployment[user]=${GITLAB_USER_EMAIL}&deployment[description]=${CI_COMMIT_MESSAGE}" https://api.newrelic.com/v2/applications/${NR_API_ID}/deployments.json
+    - >-
+      curl -X POST 'https://insights-collector.newrelic.com/v1/accounts/${NR_ACCOUNT_ID}/events' -H "X-Insert-Key:${NR_INSIGHTS_API_KEY}" -H 'Content-Type: application/json' -d "{\"eventType\": \"deployment\",\"appId\":${NR_API_ID},\"appName\":\"${NR_APP_NAME}\",\"revision\":\"${CI_BUILD_REF}\",\"changelog\": \"${CI_COMMIT_MESSAGE}\",\"description\":\"${CI_COMMIT_MESSAGE}\",\"user\": \"${GITLAB_USER_EMAIL}\"}"
+  only:
+    - master
+  except:
+    refs:
+      - tags
+      - schedules
+
+.staging: &staging
+  <<: *deployment_template
+  stage: staging
+  variables:
+    OC_TOKEN: ${OC_BSS_STAGING_PAYU_LATAM_TOKEN}
+    OC_URL: ${OPENSHIFT_BSS_STAGING_URL}
+    NR_API_KEY: ${NR_API_STAGING}
+    NR_API_ID: ${NR_APP_ID_STAGING}
+    NR_ACCOUNT_ID: 1673699
+    NR_INSIGHTS_API_KEY: ${NR_INSIGHTS_STAGING}
+    NR_APP_NAME: ${CI_PROJECT_NAME}-staging-virginia
+
+.ireland: &ireland
+  <<: *deployment_template
+  stage: production
+  variables:
+    OC_TOKEN: ${OC_BSS_IRELAND_PAYU_LATAM_TOKEN}
+    OC_URL: ${OPENSHIFT_BSS_IRELAND_URL}
+    NR_API_KEY: ${NR_API_PRODUCTION}
+    NR_API_ID: ${NR_APP_ID_IRELAND}
+    NR_ACCOUNT_ID: 1673697
+    NR_INSIGHTS_API_KEY: ${NR_INSIGHTS_PRODUCTION}
+    NR_APP_NAME: ${CI_PROJECT_NAME}-prod-ireland
+
+.singapore: &singapore
+  <<: *deployment_template
+  stage: production
+  variables:
+    OC_TOKEN: ${OC_BSS_SINGAPORE_PAYU_LATAM_TOKEN}
+    OC_URL: ${OPENSHIFT_BSS_SINGAPORE_URL}
+    NR_API_KEY: ${NR_API_PRODUCTION}
+    NR_API_ID: ${NR_APP_ID_SINGAPORE}
+    NR_ACCOUNT_ID: 1673697
+    NR_INSIGHTS_API_KEY: ${NR_INSIGHTS_PRODUCTION}
+    NR_APP_NAME: ${CI_PROJECT_NAME}-prod-singapore
+
+.virginia: &virginia
+  <<: *deployment_template
+  stage: production
+  variables:
+    OC_TOKEN: ${OC_BSS_VIRGINIA_PAYU_LATAM_TOKEN}
+    OC_URL: ${OPENSHIFT_BSS_VIRGINIA_URL}
+    NR_API_KEY: ${NR_API_PRODUCTION}
+    NR_API_ID: ${NR_APP_ID_VIRGINIA}
+    NR_ACCOUNT_ID: 1673697
+    NR_INSIGHTS_API_KEY: ${NR_INSIGHTS_PRODUCTION}
+    NR_APP_NAME: ${CI_PROJECT_NAME}-prod-virginia
+
+staging:virginia:
+  <<: *staging
+  environment:
+    name: staging
+    url: ${OPENSHIFT_BSS_STAGING_URL}
+  <<: *tagging
+  <<: *exclude
+
+production:virginia:
+ <<: *virginia
+ when: manual
+ environment:
+   name: production/virginia
+   url: ${OPENSHIFT_BSS_VIRGINIA_URL}
+ <<: *tagging
+ <<: *exclude
+
+#production:singapore:
+#  <<: *singapore
+#  when: manual
+#  environment:
+#    name: production/singapore
+#    url: ${OPENSHIFT_BSS_SINGAPORE_URL}
+#  <<: *tagging
+#  <<: *exclude

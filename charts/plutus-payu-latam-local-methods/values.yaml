@@ -1,0 +1,93 @@
+# Default values for auth-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+monetization-base:
+  image:
+    repository: registry.example.com/shared-services/payment-solutions/kotlin-api-rest-service-example
+
+  metadata:
+    labels:
+      app: kotlin-api-rest-service-example
+    annotations:
+      kube-score/ignore: pod-networkpolicy,container-security-context,pod-probes
+
+  service:
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        port: 8080
+        protocol: TCP
+        targetPort: http
+
+  docker:
+    command:
+      - java
+    args:
+      - -javaagent:/opt/newrelic/newrelic.jar
+      - --illegal-access=permit
+      - -jar
+      - /deployments/kotlin-api-rest-service-example.jar
+    ports:
+      - containerPort: 8080
+        name: http
+        protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: http
+      failureThreshold: 5
+      initialDelaySeconds: 90
+      periodSeconds: 3
+      successThreshold: 1
+      timeoutSeconds: 5
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: http
+      failureThreshold: 5
+      initialDelaySeconds: 90
+      periodSeconds: 3
+      successThreshold: 1
+      timeoutSeconds: 5
+
+  monitoring:
+    endpoint:
+      path: "/metrics"
+      port: "http"
+      interval: "30"
+    labels:
+      app: "example-payu"
+
+  hpa:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 5
+    metrics:
+      - resource:
+          name: cpu
+          targetAverageUtilization: 80
+        type: Resource
+
+  env:
+    JVM_XMX: 256m
+    NEWRELIC_CONFIG_FILE: /opt/newrelic
+    NEW_RELIC_APP_NAME: kotlin-api-rest-service-example
+    FEATURES_ENFORCEAUTHENTICATION: true
+    JAVA_TOOL_OPTIONS: '-XX:+UseContainerSupport -XX:InitialRAMPercentage=50 -XX:MaxRAMPercentage=80'
+
+  ingress:
+    enabled: false
+
+  resources:
+    requests:
+      cpu: 0.2
+      memory: 512Mi
+    limits:
+      cpu: 0.5
+      memory: 1024Mi
+
+  podDisruptionBudget:
+    enabled: false
+    spec:
+      minAvailable: 50%

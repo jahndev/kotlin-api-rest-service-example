@@ -1,0 +1,43 @@
+monetization-base:
+  env:
+    AUTHENTICATION_BASE_URL: http://:8080
+    ATTEMPT_BASE_URL: http://:8080
+    PAYMENT_BASE_URL: http://:8080
+    HYDRA_URL: https://
+    API_GATEWAY_BASE_URL: https://
+    FRONTEND_BASE_URL: https://
+    PAYU_BASE_URL: https://sandbox.api.payulatam.com/payments-api
+    PAYU_API_VERSION: 4.0
+    PAYMENTSOS_APPID:
+    PAYMENTSOS_ENV: test
+
+  resources:
+    request:
+      cpu: 0.2
+      memory: 512Mi
+    limit:
+      cpu: 0.5
+      memory: 1024Mi
+
+  hpa:
+    minReplicas: 1
+    maxReplicas: 3
+
+#hydra prd : https://tracking.example-st.com/h/v2/example-web
+
+  ingress:
+    enabled: true
+    hosts:
+      - name:
+        servicePort: http
+        paths:
+          - /example_co/payu/methods
+          - /example_co/bank_transfer/payu/initialize/
+          - /example_co/bank_transfer/payu/execute/
+          - /example_co/bank_transfer/payu/redirect/
+          - /example_co/payu/notifications
+    annotations:
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+      nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, example-App-Id, Authorization, X-example-Features, X-example-TestCase"
+      nginx.ingress.kubernetes.io/cors-allow-origin: "payments-stg.example.com"

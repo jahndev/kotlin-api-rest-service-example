@@ -1,0 +1,7 @@
+creation_rules:
+  #  - path_regex: secret.*\.yaml$
+  - path_regex: secrets.staging.yaml
+    # monetization sops kms key
+    kms: 'arn:aws:kms:eu-west-1:435260133688:key/45a7ef5a-4239-42a4-9329-a7cd41f6c18a,arn:aws:kms:eu-west-1:435260133688:key/393baf89-662f-40d3-9d19-00c4c93997d2'
+  - path_regex: secrets.(ireland|virginia|singapore).yaml
+    kms: 'arn:aws:kms:eu-central-1:321715994688:key/915d030c-c0dd-4504-808e-5f7c628e97b2'

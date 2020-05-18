@@ -1,0 +1,88 @@
+import_python('../cluster_vars.ckube', '*')
+import_python('../utility.ckube', '*')
+import_python('../shared_base.ckube', '*')
+import_python('../lookups.kube', 'get_password')
+import_python('../payments_vars.ckube', 'Routesexample')
+import_python('../payments_functions.ckube', '*')
+
+valid_clusters('staging')
+
+service_name = 'kotlin-api-rest-service-example'
+psp = 'payu'
+
+service_namespace = 'payments-{psp}'
+
+
+with namespace(service_namespace):
+    
+    add_deploymanager('payments')
+    set_annotations('Payments / Payu', 'example kotlin-api-rest-service-example.')
+    
+    frontend_url = Routesexample.frontend_routes[current_cluster_name]
+    proxy_url = Routesexample.proxy_routes[current_cluster_name]
+    ret = shared_base(
+        service_name,
+        port=8080,
+        health_delay=40,
+        vault=False,
+        route=False,
+        service=True,
+        health_port=8080,
+        health_path='/health',
+        metrics_path=None,
+        pod_metrics_path='/metrics',
+        liveness_method='http',
+        enable_app_config=False,
+        use_image_latest=None,
+        secret_base='{service_namespace}.{cluster}',
+        secrets={
+            'new_relic_license_key': 'newrelic',
+            'nr_insights': 'nr_insights',
+            'nr_account_id': 'nr_account_id'
+        },
+        env_passwd={
+            'NEW_RELIC_LICENSE_KEY': 'new_relic_license_key',
+            'NR_ACCOUNT_ID': 'nr_account_id',
+            'NR_INSIGHTS_KEY': 'nr_insights'
+        },
+        env={
+            'NEWRELIC_CONFIG_FILE': '/opt/newrelic',
+            'NEW_RELIC_APP_NAME': nr_name(service_name),
+            'JAVA_TOOL_OPTIONS': '-XX:+UseContainerSupport -XX:InitialRAMPercentage=50 -XX:MaxRAMPercentage=80'
+        },
+        cmd_line=[
+            "java",
+            "-javaagent:/opt/newrelic/newrelic.jar",
+            "-jar",
+            "{service_name}-fat.jar"
+        ],
+        image='shared-services/payment-solutions/{service_name}',
+        global_gitlab=True
+    )
+    dc = ret['dc']
+    pod_template = dc.pod_template
+
+    if current_cluster.is_prod:
+        pod_template.containers[0].resources.new_limits(cpu=1, memory='768Mi')
+        pod_template.containers[0].resources.new_requests(cpu=1, memory='768Mi')
+    else:
+        pod_template.containers[0].resources.new_limits(cpu=0.5, memory='512Mi')
+        pod_template.containers[0].resources.new_requests(cpu=0.2, memory='256Mi')
+
+    # Adding emptydir on the container to allow write on /tmp
+    add_tmp_volume(dc)
+
+    # Adding secret as yaml files
+    ret['dc'].pod_template.new_volume(
+        PodVolumeSecretSpec,
+        name='{psp}-mount-secrets',
+        secret_name=base_secret('{psp}-secret', {'secret.yaml': '{psp}-secret'}, '{service_namespace}.{cluster}').name,
+        defaultMode=0o644
+    )
+    ret['dc'].pod_template.containers[0].new_volumeMount(name=ret['dc'].pod_template.volumes[-1].name, path='/opt/secret/')
+
+    # Adding service configuration
+    configuration = {}
+    config = ConfigMap('{}-config'.format(psp), files={config_file: yaml_dump(configuration)})
+    pod_template.new_volume(PodVolumeConfigMapSpec, name=psp, map_name=config.name, defaultMode=420)
+    pod_template.containers[0].new_volumeMount(name=pod_template.volumes[-1].name, path=config_path)

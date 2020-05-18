@@ -1,0 +1,54 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
+          - metrics
+      path-mapping:
+        health: health
+        prometheus: prometheus
+        metrics: metrics
+      base-path: /
+
+features:
+  enforce-authentication: false
+
+apiGatewayBaseUrl: ${API_GATEWAY_BASE_URL}
+frontendBaseUrl: ${FRONTEND_BASE_URL}
+
+services:
+  authentication:
+    url: ${AUTHENTICATION_BASE_URL}
+  attempt:
+    url: ${ATTEMPT_BASE_URL}
+  payment:
+    url: ${PAYMENT_BASE_URL}
+  hydra:
+    url: ${HYDRA_URL}
+  payu:
+    url: ${PAYU_BASE_URL}
+    version: 4.0
+
+credentials:
+  paymentsos:
+    - integrator: example_CO
+      appId: ${PAYMENTSOS_APPID}
+      privateKey: ${PAYMENTSOS_PRIVATEKEY}
+      environment: ${PAYMENTSOS_ENV}
+  payu:
+    - integrator: example_CO
+      apiLogin: ${PAYU_LOGIN}
+      apiKey: ${PAYU_API_KEY}
+
+pse.transactionMinValue: 1600
+
+spring:
+  cache:
+    name: bankList
+    autoexpiry: true
+    expire.delay: 600000
+  rest-template:
+    paymentsos-connection-timeout: 10000
+    payu-connection-timeout: 10000

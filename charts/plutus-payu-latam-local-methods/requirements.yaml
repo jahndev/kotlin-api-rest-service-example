@@ -1,0 +1,4 @@
+dependencies:
+  - name: monetization-base
+    version: 0.5.9
+    repository: https://artifactory.example.repo/artifactory/helm

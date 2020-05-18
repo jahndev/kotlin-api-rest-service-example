@@ -1,0 +1,32 @@
+server:
+  port: 8093
+
+features:
+  enforceAuthentication: false
+
+apiGatewayBaseUrl: http://localhost
+frontendBaseUrl: http://localhost:3000
+
+services:
+  authentication:
+    url: http://authentication-service:8080
+  attempt:
+    url: http://example-orchestration:8080
+  payment:
+    url: http://example-orchestration:8080
+  hydra:
+    url: https://tracking-dev.onap.io/h/example-apinetworks
+  payu:
+    url: https://sandbox.api.payulatam.com/payments-api
+    version: 4.0
+
+credentials:
+  paymentsos:
+    - integrator: example_CO
+      appId: com.example.example_co
+      privateKey: f281c8de-fa69-4a65-bcad-3a5a2111fd6a
+      environment: test
+  payu:
+    - integrator: example_CO
+      apiLogin: login
+      apiKey: key

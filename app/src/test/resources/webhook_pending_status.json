@@ -1,0 +1,83 @@
+{
+  "created": "2020-01-14T06:25:38.154Z",
+  "account_id": "98c3b47c-b2f0-4336-8c70-bd1e7aa672af",
+  "app_id": "com.example.example_co",
+  "payment_id": "a6e1647c-2b66-4559-b9b9-21cc15268c4c",
+  "data": {
+    "id": "5550d900-0206-45f9-bfc3-6cf06da0e323",
+    "created": "1578983115023",
+    "reconciliation_id": "9bc9921555ca12418fc70ad6f356d33b692f41dc",
+    "provider_specific_data": {
+      "additional_details": {
+        "payment_country": "COL",
+        "example_payment_id": "9037b5e992b6f062c069584f655ad2db65439b15",
+        "bank_transfer_financial_institution_name": "BANCO UNION COLOMBIANO",
+        "order_language": "es",
+        "bank_transfer_payment_method_vendor": "PSE",
+        "bank_transfer_financial_institution_code": "1022",
+        "user_type": "N",
+        "national_identify_type": "CC",
+        "payer_email": "",
+        "merchant_payer_id": "user3@example.org",
+        "national_identify_number": "9876543210",
+        "customer_national_identify_number": "9876543210"
+      }
+    },
+    "payment_method": {
+      "alternative_payment": {
+        "additional_details": {
+          "financial_institution_name": "BANCO UNION COLOMBIANO",
+          "user_type": "N",
+          "financial_institution_code": "1022",
+          "national_identify_number": "XXXXXXXXXX"
+        },
+        "vendor": "PSE"
+      },
+      "type": "untokenized",
+      "source_type": "BankTransfer"
+    },
+    "ip_address": "127.0.0.1",
+    "originating_purchase_country": "USA",
+    "result": {
+      "status": "Pending"
+    },
+    "provider_data": {
+      "provider_name": "PayULatam",
+      "response_code": "PENDING_TRANSACTION_CONFIRMATION",
+      "description": "PENDING",
+      "raw_response": "{\"merchant_name\":\"example Global\",\"extra1\":\"\",\"authorizationCode\":\"\",\"lng\":\"es\",\"x_idempotency_key\":\"a6e1647c-2b66-4559-b9b9-21cc15268c4c_98c3b47c-b2f0-4336-8c70-bd1e7aa672af_Charge\",\"responseCode\":\"PENDING_TRANSACTION_CONFIRMATION\",\"polPaymentMethod\":\"25\",\"state\":\"PENDING\",\"polTransactionState\":\"14\",\"description\":\"42 example credits\",\"orderId\":\"848177096\",\"polResponseCode\":\"25\",\"polPaymentMethodType\":\"4\",\"operationDate\":null,\"pendingReason\":\"AWAITING_NOTIFICATION\",\"lapTransactionState\":\"PENDING\",\"signature\":\"3ed4512436dac0ec1203b1649e39e437\",\"processingDate\":\"2020-01-14\",\"risk\":\".00\",\"pseReference2\":\"\",\"pseReference1\":\"127.0.0.1\",\"merchant_address\":\"Av 123 Calle 12\",\"lapPaymentMethodType\":\"PSE\",\"reference_pol\":\"848177096\",\"referenceCode\":\"9bc9921555ca12418fc70ad6f356d33b692f41dc\",\"x_request_id\":\"681f918b-ed91-41a5-8dfc-0140d3907671\",\"paymentNetworkResponseErrorMessage\":null,\"merchantId\":\"510507\",\"errorCode\":null,\"pseCycle\":\"1\",\"lapResponseCode\":\"PENDING_TRANSACTION_CONFIRMATION\",\"buyerEmail\":\"\",\"extra3\":\"\",\"pseReference3\":\"9876543210\",\"lapPaymentMethod\":\"PSE\",\"TX_VALUE\":\"340000.00\",\"responseMessage\":null,\"referenceQuestionnaire\":null,\"pseBank\":\"BANCO UNION COLOMBIANO\",\"currency\":\"COP\",\"telephone\":\"7563126\",\"additionalInfo\":null,\"message\":\"Pending\",\"installmentsNumber\":\"1\",\"trazabilityCode\":\"1712550\",\"transactionDate\":null,\"BANK_URL\":\"https://registro.desarrollo.pse.com.co/PSEUserRegister/StartTransaction.aspx?enc=tnPcJHMKlSnmRpHM8fAbu0qZVuqmfDyuprm7DI0vb2GKv9LVqnbRuWIvJOb6sJPp\",\"TRANSACTION_CYCLE\":\"1\",\"orderLanguage\":\"es\",\"transactionTime\":null,\"paymentNetworkResponseCode\":null,\"extraParameters\":\"{\\\"BANK_URL\\\":\\\"https://registro.desarrollo.pse.com.co/PSEUserRegister/StartTransaction.aspx?enc=tnPcJHMKlSnmRpHM8fAbu0qZVuqmfDyuprm7DI0vb2GKv9LVqnbRuWIvJOb6sJPp\\\",\\\"TRANSACTION_CYCLE\\\":\\\"1\\\"}\",\"transactionState\":\"7\",\"transactionId\":\"59f45586-e2a8-4b16-a0c2-f8640de5bfdf\",\"cus\":\"1712550\",\"TX_TAX\":\".00\",\"merchant_url\":\"\",\"extra2\":\"\"}",
+      "transaction_id": "59f45586-e2a8-4b16-a0c2-f8640de5bfdf",
+      "external_id": "848177096",
+      "additional_information": {
+        "polTransactionState": "14",
+        "description": "42 example credits",
+        "polResponseCode": "25",
+        "lapTransactionState": "PENDING",
+        "pseReference1": "127.0.0.1",
+        "reference_pol": "848177096",
+        "referenceCode": "9bc9921555ca12418fc70ad6f356d33b692f41dc",
+        "lapResponseCode": "PENDING_TRANSACTION_CONFIRMATION",
+        "TX_VALUE": "340000.00",
+        "pseBank": "BANCO UNION COLOMBIANO",
+        "currency": "COP",
+        "trazabilityCode": "1712550",
+        "transactionState": "7",
+        "transactionId": "59f45586-e2a8-4b16-a0c2-f8640de5bfdf",
+        "cus": "1712550"
+      }
+    },
+    "amount": 34000000,
+    "provider_configuration": {
+      "id": "b0582e0a-c250-4376-84cd-90354d054b0c",
+      "name": "example_CO",
+      "description": "",
+      "created": "1571156645781",
+      "modified": "1571156645781",
+      "account_id": "98c3b47c-b2f0-4336-8c70-bd1e7aa672af",
+      "provider_id": "3d9cb628-a5cd-49e2-b455-e46b10d7b6f3",
+      "type": "cc_processor",
+      "href": "https://api.paymentsos.com/accounts/98c3b47c-b2f0-4336-8c70-bd1e7aa672af/provider-configurations/b0582e0a-c250-4376-84cd-90354d054b0c"
+    }
+  },
+  "id": "a6e1647c-2b66-4559-b9b9-21cc15268c4c-2020-01-14T06:25:38.154Z-b1f04ff0-351e-4a51-a4cd-bfa5e77f51f9"
+}

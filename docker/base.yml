@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  app:
+    build: ./app
+    container_name: kotlin-api-rest-service-example
+    image: kotlin-api-rest-service-example
+    networks:
+      - docker_example
+    volumes:
+      - ./app/build/config:/opt/config
+    ports:
+      - "8080:8080"
+    environment:
+      - API_GATEWAY_BASE_URL=http://localhost
+      - FRONTEND_BASE_URL=http://localhost:3000
+      - AUTHENTICATION_BASE_URL=http://authentication-service:8080
+      - ATTEMPT_BASE_URL=http://example-orchestration:8080
+      - PAYMENT_BASE_URL=http://example-orchestration:8080
+      - HYDRA_URL=https://tracking-dev.onap.io/h/example-apinetworks
+
+networks:
+  docker_example:
+    external: true

@@ -1,0 +1,21 @@
+1. Get the application URL by running these commands:
+{{- if index .Values "monetization-base" "ingress" "enabled" }}
+{{- range $host := index .Values "monetization-base" "ingress" "hosts" }}
+  {{- range .paths }}
+  http{{ if index $.Values "monetization-base" "ingress" "tls" }}s{{ end }}://{{ $host.host }}{{ . }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" (index .Values "monetization-base" "service" "type") }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Values.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "internal-service.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" (index .Values "monetization-base" "service" "type") }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace {{ .Values.namespace }} svc -w {{ include "internal-service.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ include "internal-service.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:{{ index .Values "monetization-base" "service" "port" }}
+{{- else if contains "ClusterIP" (index .Values "monetization-base" "service" "type") }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Values.namespace }} -l "app.kubernetes.io/name={{ include "internal-service.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl port-forward $POD_NAME 8080:80
+{{- end }}
